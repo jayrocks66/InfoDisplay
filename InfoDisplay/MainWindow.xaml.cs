@@ -59,7 +59,15 @@ namespace InfoDisplay
             {
                 if (File.Exists("UpdateToken"))
                 {
-                    File.Delete("UpdateToken");
+                    try
+                    {
+                        File.Delete("UpdateToken");
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("Errore durante la cancellazione del file UpdateToken. Verificare che l'app abbia i permessi di scrittura nella directory in cui viene eseguita, altrimenti si verificherà quest'errore ad ogni tentativo di aggiornamento dei contenuti.\r\n\r\nException dump:\r\n" + e.Message, "Errore", MessageBoxButton.OK, MessageBoxImage.Error);
+                        Environment.Exit(1);
+                    }                    
                     slides = new Slide().ReadSlides();
                     settings = new GlobalSettings().ReadGlobalSettings();
                 }
