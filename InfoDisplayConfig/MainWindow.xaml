@@ -1,0 +1,95 @@
+﻿<Window x:Class="InfoDisplayConfig.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:InfoDisplayConfig"
+        mc:Ignorable="d"
+        Title="InfoDisplay Config" Height="400" Width="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="9*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="0.25*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="0.25*"/>
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="cbx_Slides" Grid.Column="1" Width="Auto" SelectionChanged="cbx_Slides_SelectionChanged" SelectedIndex="0">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Title}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button x:Name="btn_AddSlide" Grid.Column="3" HorizontalAlignment="Left" Width="40" Click="btn_AddSlide_Click" >+</Button>
+            <Button x:Name="btn_RemoveSlide" Grid.Column="5" Click="btn_RemoveSlide_Click" >-</Button>
+            <Button x:Name="btn_PreviewSlide" Grid.Column="7" Click="btn_PreviewSlide_Click" >PW</Button>
+            <Button x:Name="btn_GlobalSettingsConfig" Grid.Column="9" Click="btn_GlobalSettingsConfig_Click" >S</Button>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="7*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0">Titolo:</Label>
+            <Label Grid.Row="1">Contenuto:</Label>
+            <Label Grid.Row="2">Immagine:</Label>
+            <Label Grid.Row="3">Layout:</Label>
+            <Label Grid.Row="4">Durata:</Label>
+            <TextBox x:Name="tb_SlideTitle" Grid.Row="0" Grid.Column="1" Text="{Binding Title}" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"></TextBox>
+            <TextBox x:Name="tb_SlideContent" Grid.Row="1" Grid.Column="1" Text="{Binding Content}" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" ></TextBox>
+            <Grid Grid.Row="2" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="9*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <Image x:Name="img_SlideImage" Grid.Row="0" Source="{Binding Image}"></Image>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="4.5*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="4.5*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="btn_slideImgSelect" Grid.Column="0" Click="btn_slideImgSelect_Click">Seleziona</Button>
+                    <Button x:Name="btn_slideImgDelete" Grid.Column="2" Click="btn_slideImgDelete_Click">Elimina</Button>
+                </Grid>
+
+            </Grid>
+            
+            <Grid Grid.Row="3" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5*"/>
+                    <ColumnDefinition Width="5*"/>
+                </Grid.ColumnDefinitions>
+                <RadioButton x:Name="rbt_Layout0" Grid.Column="0" GroupName="rbt_GroupSlideLayout" Checked="rbt_Layout0_Checked">Con Immagine</RadioButton>
+                <RadioButton x:Name="rbt_Layout1" Grid.Column="2" GroupName="rbt_GroupSlideLayout" Checked="rbt_Layout1_Checked">Senza Immagine</RadioButton>
+            </Grid>
+            <TextBox x:Name="tb_SlideDuration" Grid.Row="4" Grid.Column="1" Text="{Binding Duration}" TextChanged="tb_SlideDuration_TextChanged"></TextBox>
+            <Button x:Name="btn_Save" Grid.Column="1" Grid.Row="5" Click="btn_Save_Click">Salva</Button>
+
+            </Grid>
+
+
+    </Grid>
+</Window>
