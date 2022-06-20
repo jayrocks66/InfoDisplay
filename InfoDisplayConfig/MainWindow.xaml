@@ -98,7 +98,7 @@
                     <ColumnDefinition Width="7*"/>
                 </Grid.ColumnDefinitions>
                 <CheckBox x:Name="cb_ExpirationDateEnabled" Grid.Column="0" IsChecked="{Binding ExpirationDateEnabled}"/>
-                <DatePicker x:Name="dpt_ExpirationDate" Grid.Column="1" SelectedDateChanged="dpt_ExpirationDate_SelectedDateChanged" DisplayDateStart="{Binding Source={x:Static sys:DateTime.Now}}" SelectedDate="{Binding ExpirationDate}" IsEnabled="{Binding ExpirationDateEnabled}" Visibility="{Binding Path=ExpirationDateEnabled, Converter={StaticResource BoolToVis}}" />
+                <DatePicker x:Name="dpt_ExpirationDate" Grid.Column="1" SelectedDateChanged="dpt_ExpirationDate_SelectedDateChanged" SelectedDate="{Binding ExpirationDate}" IsEnabled="{Binding ExpirationDateEnabled}" Visibility="{Binding Path=ExpirationDateEnabled, Converter={StaticResource BoolToVis}}" />
 
             </Grid>
             <Button x:Name="btn_Save" Grid.Column="1" Grid.Row="6" Click="btn_Save_Click">Salva</Button>
