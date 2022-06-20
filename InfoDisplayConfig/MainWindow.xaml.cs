@@ -23,6 +23,7 @@ namespace InfoDisplayConfig
         public MainWindow()
         {
             InitializeComponent();
+            new InfoDisplay.Slide().PurgeExpired();
             slides = new InfoDisplay.Slide().ReadSlides();
             if (slides.Count < 1) slides.Add(new InfoDisplay.Slide().GenerateDefaultSlide(0));
             cbx_Slides.ItemsSource = slides;
@@ -146,6 +147,14 @@ namespace InfoDisplayConfig
         private void btn_GlobalSettingsConfig_Click(object sender, RoutedEventArgs e)
         {
             new GlobalSettingsConfig().ShowDialog();
+        }
+
+        private void dpt_ExpirationDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (dpt_ExpirationDate.SelectedDate < DateTime.Today.AddDays(1))
+            {
+                dpt_ExpirationDate.SelectedDate = DateTime.Today.AddDays(1);
+            }
         }
     }
 }

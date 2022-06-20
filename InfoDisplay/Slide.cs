@@ -16,8 +16,10 @@ namespace InfoDisplay
         public string ImageBase64 { get; set; }
         public int Duration { get; set; }
         public int Layout { get; set; }
+        public DateTime ExpirationDate { get; set; }
+        public bool ExpirationDateEnabled { get; set; }
         public Slide() { }
-        public Slide(string title, string content, int order, string imageBase64 = "", int duration = 10000, int layout = 0)
+        public Slide(string title, string content, int order, string imageBase64 = "", int duration = 10000, int layout = 0, DateTime expirationDate = default, bool expirationDateEnabled = false)
         {
             Title = title;
             Content = content;
@@ -25,11 +27,20 @@ namespace InfoDisplay
             ImageBase64 = imageBase64;
             Duration = duration;
             Layout = layout;
+            ExpirationDate = expirationDate;
+            ExpirationDateEnabled = expirationDateEnabled;
         }
-        public List<Slide> ReadSlides()
+        public List<Slide> ReadSlides(bool unexpiredOnly = false)
         {
             List<Slide> ls = new List<Slide>();
             if (File.Exists("Slides.json")) ls = JsonSerializer.Deserialize<List<Slide>>(File.ReadAllText("Slides.json")).OrderBy(o => o.Order).ToList();
+            if (unexpiredOnly)
+            {
+                foreach (Slide slide in ls.ToList())
+                {
+                    if (slide.ExpirationDateEnabled && slide.ExpirationDate <= DateTime.Today) ls.Remove(slide);
+                }
+            }
             return ls;
         }
         [JsonIgnore]
@@ -67,6 +78,17 @@ namespace InfoDisplay
             }
             ImageBase64 = Convert.ToBase64String(data);
             Image = bi;
+        }
+        public void PurgeExpired()
+        {
+            List<Slide> ls = new List<Slide>();
+            if (File.Exists("Slides.json")) ls = JsonSerializer.Deserialize<List<Slide>>(File.ReadAllText("Slides.json")).OrderBy(o => o.Order).ToList();
+            foreach (Slide slide in ls.ToList())
+                {
+                    if (slide.ExpirationDateEnabled && slide.ExpirationDate <= DateTime.Today) ls.Remove(slide);
+                }
+            string jsonString = JsonSerializer.Serialize(ls);
+            File.WriteAllText("Slides.json", jsonString);
         }
         public Slide GenerateDefaultSlide(int order)
         {

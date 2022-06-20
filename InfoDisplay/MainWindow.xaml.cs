@@ -27,6 +27,7 @@ namespace InfoDisplay
         public MainWindow(bool previewMode = false, Slide previewSlide = null)
         {
             settings = new GlobalSettings().ReadGlobalSettings();
+            new Slide().PurgeExpired();
             
             InitializeComponent();
             if (previewMode == true)
@@ -40,7 +41,7 @@ namespace InfoDisplay
             }
             else
             {
-                slides = new Slide().ReadSlides();
+                slides = new Slide().ReadSlides(true);
 
                 CancellationToken cancellationToken = new CancellationToken();
 
