@@ -76,6 +76,18 @@ namespace InfoDisplay
             }
 
         }
+        public async void PurgeExpired(CancellationToken cancellationToken)
+        {
+            while (true)
+            {
+                bool somethingWasPurged = new Slide().PurgeExpired();
+                if (somethingWasPurged)
+                {
+                    slides = new Slide().ReadSlides();
+                }
+                await Task.Delay(10000);
+            }
+        }
 
         public async void TimeThread(CancellationToken cancellationToken)
         {

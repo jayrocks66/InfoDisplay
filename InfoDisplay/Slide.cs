@@ -72,16 +72,22 @@ namespace InfoDisplay
             ImageBase64 = Convert.ToBase64String(data);
             Image = bi;
         }
-        public void PurgeExpired()
+        public bool PurgeExpired()
         {
             List<Slide> ls = new List<Slide>();
+            bool somethingWasPurged = false;
             if (File.Exists("Slides.json")) ls = JsonSerializer.Deserialize<List<Slide>>(File.ReadAllText("Slides.json")).OrderBy(o => o.Order).ToList();
             foreach (Slide slide in ls.ToList())
                 {
-                    if (slide.ExpirationDateEnabled && slide.ExpirationDate <= DateTime.Today) ls.Remove(slide);
+                if (slide.ExpirationDateEnabled && slide.ExpirationDate <= DateTime.Today)
+                    {
+                        ls.Remove(slide);
+                        somethingWasPurged = true;
+                    }
                 }
             string jsonString = JsonSerializer.Serialize(ls);
             File.WriteAllText("Slides.json", jsonString);
+            return somethingWasPurged;
         }
         public Slide GenerateDefaultSlide(int order)
         {
