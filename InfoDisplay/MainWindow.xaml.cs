@@ -41,7 +41,7 @@ namespace InfoDisplay
             }
             else
             {
-                slides = new Slide().ReadSlides(true);
+                slides = new Slide().ReadSlides();
 
                 CancellationToken cancellationToken = new CancellationToken();
 

@@ -30,17 +30,10 @@ namespace InfoDisplay
             ExpirationDate = expirationDate;
             ExpirationDateEnabled = expirationDateEnabled;
         }
-        public List<Slide> ReadSlides(bool unexpiredOnly = false)
+        public List<Slide> ReadSlides()
         {
             List<Slide> ls = new List<Slide>();
             if (File.Exists("Slides.json")) ls = JsonSerializer.Deserialize<List<Slide>>(File.ReadAllText("Slides.json")).OrderBy(o => o.Order).ToList();
-            if (unexpiredOnly)
-            {
-                foreach (Slide slide in ls.ToList())
-                {
-                    if (slide.ExpirationDateEnabled && slide.ExpirationDate <= DateTime.Today) ls.Remove(slide);
-                }
-            }
             return ls;
         }
         [JsonIgnore]
