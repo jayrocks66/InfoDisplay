@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace InfoDisplayConfig
+namespace InfoDisplay.Config
 {
     /// <summary>
     /// Interaction logic for App.xaml

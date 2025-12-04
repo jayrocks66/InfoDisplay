@@ -5,7 +5,7 @@ using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Media;
 
-namespace InfoDisplayConfig
+namespace InfoDisplay.Config
 {
     /// <summary>
     /// Logica di interazione per GlobalSettingsConfig.xaml
@@ -18,7 +18,6 @@ namespace InfoDisplayConfig
             InitializeComponent();
             settings = new InfoDisplay.GlobalSettings().ReadGlobalSettings();
             DataContext = settings;
-
         }
 
         private void btn_Save_Click(object sender, RoutedEventArgs e)

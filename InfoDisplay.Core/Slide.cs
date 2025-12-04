@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows.Media.Imaging;
 
-namespace InfoDisplay
+namespace InfoDisplay.Core
 {
     public class Slide
     {
@@ -18,7 +18,9 @@ namespace InfoDisplay
         public int Layout { get; set; }
         public DateTime ExpirationDate { get; set; }
         public bool ExpirationDateEnabled { get; set; }
+
         public Slide() { }
+
         public Slide(string title, string content, int order, string imageBase64 = "", int duration = 10000, int layout = 0, DateTime expirationDate = default, bool expirationDateEnabled = false)
         {
             Title = title;
@@ -30,41 +32,58 @@ namespace InfoDisplay
             ExpirationDate = expirationDate;
             ExpirationDateEnabled = expirationDateEnabled;
         }
+
         public List<Slide> ReadSlides()
         {
-            List<Slide> ls = new List<Slide>();
-            if (File.Exists("Slides.json")) ls = JsonSerializer.Deserialize<List<Slide>>(File.ReadAllText("Slides.json")).OrderBy(o => o.Order).ToList();
+            var ls = new List<Slide>();
+
+            if (File.Exists(AppPaths.SlidesJson))
+            {
+                var json = File.ReadAllText(AppPaths.SlidesJson);
+                ls = JsonSerializer.Deserialize<List<Slide>>(json)
+                                    .OrderBy(o => o.Order)
+                                    .ToList();
+            }
+
             return ls;
         }
+
         [JsonIgnore]
         public BitmapImage Image
         {
             get
             {
-                BitmapImage bi = new BitmapImage();
-                if (ImageBase64 != "")
+                var bi = new BitmapImage();
+
+                if (!string.IsNullOrEmpty(ImageBase64))
                 {
-
-                    byte[] binaryData = Convert.FromBase64String(ImageBase64);
-                    bi.BeginInit();
-                    bi.StreamSource = new MemoryStream(binaryData);
-                    bi.EndInit();
-
+                    try
+                    {
+                        byte[] binaryData = Convert.FromBase64String(ImageBase64);
+                        bi.BeginInit();
+                        bi.StreamSource = new MemoryStream(binaryData);
+                        bi.EndInit();
+                    }
+                    catch
+                    {
+                        // Se l'immagine è corrotta, torno un BitmapImage "vuoto" e basta
+                    }
                 }
-                return bi;
 
+                return bi;
             }
             set
             {
-
+                // lasciato intenzionalmente vuoto, usi SetImageBase64FromBitmapImage
             }
         }
+
         public void SetImageBase64FromBitmapImage(BitmapImage bi)
         {
             byte[] data;
-            JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+            var encoder = new JpegBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bi));
-            using (MemoryStream ms = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
                 encoder.Save(ms);
                 data = ms.ToArray();
@@ -72,27 +91,37 @@ namespace InfoDisplay
             ImageBase64 = Convert.ToBase64String(data);
             Image = bi;
         }
+
         public bool PurgeExpired()
         {
-            List<Slide> ls = new List<Slide>();
-            bool somethingWasPurged = false;
-            if (File.Exists("Slides.json")) ls = JsonSerializer.Deserialize<List<Slide>>(File.ReadAllText("Slides.json")).OrderBy(o => o.Order).ToList();
-            foreach (Slide slide in ls.ToList())
-                {
+            var ls = new List<Slide>();
+            var somethingWasPurged = false;
+
+            if (File.Exists(AppPaths.SlidesJson))
+            {
+                var json = File.ReadAllText(AppPaths.SlidesJson);
+                ls = JsonSerializer.Deserialize<List<Slide>>(json)
+                                    .OrderBy(o => o.Order)
+                                    .ToList();
+            }
+
+            foreach (var slide in ls.ToList())
+            {
                 if (slide.ExpirationDateEnabled && slide.ExpirationDate <= DateTime.Today)
-                    {
-                        ls.Remove(slide);
-                        somethingWasPurged = true;
-                    }
+                {
+                    ls.Remove(slide);
+                    somethingWasPurged = true;
                 }
-            string jsonString = JsonSerializer.Serialize(ls);
-            File.WriteAllText("Slides.json", jsonString);
+            }
+
+            var jsonString = JsonSerializer.Serialize(ls);
+            File.WriteAllText(AppPaths.SlidesJson, jsonString);
             return somethingWasPurged;
         }
+
         public Slide GenerateDefaultSlide(int order)
         {
             return new Slide("Nuova Slide", "", order);
         }
     }
-
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using InfoDisplay.Core;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
-namespace InfoDisplayConfig
+namespace InfoDisplay.Config
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -18,14 +19,16 @@ namespace InfoDisplayConfig
         //TODO: save serialize and leave updatetoken, add default image
 
 
-        List<InfoDisplay.Slide> slides;
+    
 
-        public MainWindow()
+    List<Slide> slides;
+
+    public MainWindow()
         {
             InitializeComponent();
-            new InfoDisplay.Slide().PurgeExpired();
-            slides = new InfoDisplay.Slide().ReadSlides();
-            if (slides.Count < 1) slides.Add(new InfoDisplay.Slide().GenerateDefaultSlide(0));
+            new Slide().PurgeExpired();
+            slides = new Slide().ReadSlides();
+            if (slides.Count < 1) slides.Add(new Slide().GenerateDefaultSlide(0));
             cbx_Slides.ItemsSource = slides;
             checkRemoveButton();
 
@@ -36,7 +39,7 @@ namespace InfoDisplayConfig
             DataContext = cbx_Slides.SelectedItem;
             if (cbx_Slides.SelectedIndex > -1)
             {
-                if (((InfoDisplay.Slide)cbx_Slides.SelectedItem).Layout == 1)
+                if (((Slide)cbx_Slides.SelectedItem).Layout == 1)
                 {
                     rbt_Layout1.IsChecked = true;
                 }
@@ -94,7 +97,7 @@ namespace InfoDisplayConfig
 
         private void btn_AddSlide_Click(object sender, RoutedEventArgs e)
         {
-            slides.Add(new InfoDisplay.Slide().GenerateDefaultSlide(slides.Count - 1));
+            slides.Add(new Slide().GenerateDefaultSlide(slides.Count - 1));
             cbx_Slides.ItemsSource = null;
             cbx_Slides.ItemsSource = slides;
             cbx_Slides.SelectedIndex = slides.Count - 1;
@@ -104,7 +107,7 @@ namespace InfoDisplayConfig
         private void btn_RemoveSlide_Click(object sender, RoutedEventArgs e)
         {
             int oldSelectedIndex = cbx_Slides.SelectedIndex;
-            slides.Remove((InfoDisplay.Slide)cbx_Slides.SelectedItem);
+            slides.Remove((Slide)cbx_Slides.SelectedItem);
             cbx_Slides.ItemsSource = null;
             cbx_Slides.ItemsSource = slides;
             if (oldSelectedIndex > 0) cbx_Slides.SelectedIndex = oldSelectedIndex - 1;
@@ -128,8 +131,8 @@ namespace InfoDisplayConfig
             if (!Validation.GetHasError(tb_SlideDuration))
             {
                 string jsonString = JsonSerializer.Serialize(slides);
-                File.WriteAllText("Slides.json", jsonString);
-                File.WriteAllText("UpdateToken", "");
+                File.WriteAllText(AppPaths.SlidesJson, jsonString);
+                File.WriteAllText(AppPaths.UpdateToken, "");
             }
         }
 
@@ -140,7 +143,7 @@ namespace InfoDisplayConfig
 
         private void btn_PreviewSlide_Click(object sender, RoutedEventArgs e)
         {
-            InfoDisplay.MainWindow newForm = new InfoDisplay.MainWindow(true, slides[cbx_Slides.SelectedIndex]); ;
+            InfoDisplay.Player.MainWindow newForm = new InfoDisplay.Player.MainWindow(true, slides[cbx_Slides.SelectedIndex]); ;
             newForm.Show();
         }
 

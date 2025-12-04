@@ -6,14 +6,14 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>C:\Users\j.ricci-adm\source\repos\InfoDisplay\Build\</OutputPath>
-  </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Images\logo.png" />
     <None Remove="Images\massa01.jpg" />
     <None Remove="Slides.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InfoDisplay.Core\InfoDisplay.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

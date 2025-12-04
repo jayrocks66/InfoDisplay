@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30320.27
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfoDisplay", "InfoDisplay\InfoDisplay.csproj", "{4BC6E2C1-B663-43C0-AF61-F49AD38D169A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfoDisplay.Player", "InfoDisplay\InfoDisplay.Player.csproj", "{4BC6E2C1-B663-43C0-AF61-F49AD38D169A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfoDisplayConfig", "InfoDisplayConfig\InfoDisplayConfig.csproj", "{EF5B7437-485D-42FF-9BA3-06543AA7772F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfoDisplay.Config", "InfoDisplayConfig\InfoDisplay.Config.csproj", "{EF5B7437-485D-42FF-9BA3-06543AA7772F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfoDisplay.Core", "InfoDisplay.Core\InfoDisplay.Core.csproj", "{E55784B8-3488-4279-B831-4BBDF72B00EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{EF5B7437-485D-42FF-9BA3-06543AA7772F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF5B7437-485D-42FF-9BA3-06543AA7772F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF5B7437-485D-42FF-9BA3-06543AA7772F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E55784B8-3488-4279-B831-4BBDF72B00EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E55784B8-3488-4279-B831-4BBDF72B00EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E55784B8-3488-4279-B831-4BBDF72B00EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E55784B8-3488-4279-B831-4BBDF72B00EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

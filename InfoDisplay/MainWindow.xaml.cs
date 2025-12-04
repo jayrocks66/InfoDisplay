@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Effects;
+using InfoDisplay.Core;
 
-namespace InfoDisplay
+namespace InfoDisplay.Player
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -42,7 +43,19 @@ namespace InfoDisplay
             else
             {
                 slides = new Slide().ReadSlides();
-
+                if (slides == null || slides.Count == 0)
+                {
+                    slides = new List<Slide>
+                    {
+                        new Slide
+                        {
+                            Title = "Nessuna slide configurata",
+                            Content = "Apri InfoDisplayConfig e aggiungi almeno una slide.",
+                            Layout = 1,
+                            Duration = 15000 
+                        }
+                    };
+                }
                 CancellationToken cancellationToken = new CancellationToken();
 
                 SlideThread(cancellationToken);
@@ -58,11 +71,11 @@ namespace InfoDisplay
         {
             while (true)
             {
-                if (File.Exists("UpdateToken"))
+                if (File.Exists(AppPaths.UpdateToken))
                 {
                     try
                     {
-                        File.Delete("UpdateToken");
+                        File.Delete(AppPaths.UpdateToken);
                     }
                     catch (Exception e)
                     {
@@ -70,6 +83,22 @@ namespace InfoDisplay
                         Environment.Exit(1);
                     }                    
                     slides = new Slide().ReadSlides();
+
+
+                    if (slides == null || slides.Count == 0)
+                    {
+                        slides = new List<Slide>
+    {
+                            new Slide
+                            {
+                                Title = "Nessuna slide configurata",
+                                Content = "Apri InfoDisplayConfig e aggiungi almeno una slide.",
+                                Layout = 1,
+                                Duration = 15000
+                            }
+                        };
+                    }
+
                     settings = new GlobalSettings().ReadGlobalSettings();
                 }
                 await Task.Delay(10000);
