@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\InfoDisplay.Core\InfoDisplay.Core.csproj" />
-    <ProjectReference Include="..\InfoDisplay\InfoDisplay.Player.csproj" />
+    <ProjectReference Include="..\InfoDisplay.Player\InfoDisplay.Player.csproj" />
   </ItemGroup>
 
 </Project>
