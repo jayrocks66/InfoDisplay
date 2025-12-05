@@ -37,15 +37,25 @@ namespace InfoDisplay.Core
         {
             var ls = new List<Slide>();
 
-            if (File.Exists(AppPaths.SlidesJson))
+            // No file -> no slide
+            if (!File.Exists(AppPaths.SlidesJson))
+                return ls;
+
+            try
             {
                 var json = File.ReadAllText(AppPaths.SlidesJson);
-                ls = JsonSerializer.Deserialize<List<Slide>>(json)
-                                    .OrderBy(o => o.Order)
-                                    .ToList();
-            }
+                var slides = JsonSerializer.Deserialize<List<Slide>>(json);
 
-            return ls;
+                if (slides == null)
+                    return ls;
+
+                return slides.OrderBy(o => o.Order).ToList();
+            }
+            catch
+            {
+                //Ignore if unreadable/corrupted
+                return ls;
+            }
         }
 
         [JsonIgnore]
@@ -99,10 +109,20 @@ namespace InfoDisplay.Core
 
             if (File.Exists(AppPaths.SlidesJson))
             {
-                var json = File.ReadAllText(AppPaths.SlidesJson);
-                ls = JsonSerializer.Deserialize<List<Slide>>(json)
-                                    .OrderBy(o => o.Order)
-                                    .ToList();
+                try
+                {
+                    var json = File.ReadAllText(AppPaths.SlidesJson);
+                    var slides = JsonSerializer.Deserialize<List<Slide>>(json);
+
+                    if (slides != null)
+                        ls = slides.OrderBy(o => o.Order).ToList();
+                }
+                catch
+                {
+                    // If file is corrupter, don't even try purging:
+                    // Configurator will overwrite on next save.
+                    return false;
+                }
             }
 
             foreach (var slide in ls.ToList())
@@ -114,8 +134,15 @@ namespace InfoDisplay.Core
                 }
             }
 
-            var jsonString = JsonSerializer.Serialize(ls);
-            File.WriteAllText(AppPaths.SlidesJson, jsonString);
+            if (somethingWasPurged)
+            {
+                var jsonString = JsonSerializer.Serialize(ls, new JsonSerializerOptions
+                {
+                    WriteIndented = true
+                });
+                File.WriteAllText(AppPaths.SlidesJson, jsonString);
+            }
+
             return somethingWasPurged;
         }
 

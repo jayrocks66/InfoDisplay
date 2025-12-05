@@ -1,31 +1,30 @@
-﻿using System;
-using System.Drawing;
+﻿using InfoDisplay.Core;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Forms;
-using System.Windows.Media;
 
 namespace InfoDisplay.Config
 {
-    /// <summary>
-    /// Logica di interazione per GlobalSettingsConfig.xaml
-    /// </summary>
     public partial class GlobalSettingsConfig : Window
     {
-        InfoDisplay.GlobalSettings settings = new InfoDisplay.GlobalSettings();
+        private readonly GlobalSettings _settings;
+
         public GlobalSettingsConfig()
         {
             InitializeComponent();
-            settings = new InfoDisplay.GlobalSettings().ReadGlobalSettings();
-            DataContext = settings;
+
+            _settings = GlobalSettings.Load();
+            DataContext = _settings;
         }
 
         private void btn_Save_Click(object sender, RoutedEventArgs e)
         {
-            new InfoDisplay.GlobalSettings().SaveGlobalSettings((InfoDisplay.GlobalSettings)DataContext);
-            this.Close();
+            _settings.Save();
+            DialogResult = true; // opzionale
+            Close();
         }
 
-
+        private void btn_Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }
