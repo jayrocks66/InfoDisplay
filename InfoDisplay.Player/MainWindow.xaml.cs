@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InfoDisplay.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,8 +7,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Effects;
-using InfoDisplay.Core;
 
 namespace InfoDisplay.Player
 {
@@ -29,7 +30,9 @@ namespace InfoDisplay.Player
         {
             settings = GlobalSettings.Load();
             new Slide().PurgeExpired();
-            
+
+            this.FontFamily = ResolveFontFamily(settings.FontFamilyName);
+
             InitializeComponent();
             if (previewMode == true)
             {
@@ -226,6 +229,21 @@ namespace InfoDisplay.Player
         {
             this.Close();
         }
+        private static FontFamily ResolveFontFamily(string fontName)
+        {
+            const string fallback = "Segoe UI";
 
+            if (string.IsNullOrWhiteSpace(fontName))
+                return new FontFamily(fallback);
+
+            var match = Fonts.SystemFontFamilies
+                             .FirstOrDefault(f =>
+                                 string.Equals(f.Source, fontName, System.StringComparison.OrdinalIgnoreCase));
+
+            if (match != null)
+                return match;
+
+            return new FontFamily(fallback);
+        }
     }
 }

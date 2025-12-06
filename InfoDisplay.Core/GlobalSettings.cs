@@ -8,7 +8,7 @@ namespace InfoDisplay.Core
     {
 
         public bool SlideAnimationsEnabled { get; set; } = true;
-
+        public string FontFamilyName { get; set; } = "Segoe UI";
 
         /// <summary>
         /// Load settings from GlobalSettings.json.
