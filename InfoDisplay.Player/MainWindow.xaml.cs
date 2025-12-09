@@ -20,9 +20,14 @@ namespace InfoDisplay.Player
 
     public partial class MainWindow : Window
     {
-        List<Slide> slides;
-        GlobalSettings settings;
-        DropShadowEffect slideBoxesShadowEffect = new DropShadowEffect();
+        private List<Slide> slides;
+        private GlobalSettings settings;
+        private readonly DropShadowEffect slideBoxesShadowEffect = new DropShadowEffect();
+
+        private CancellationTokenSource _cts;
+        private Task _slideTask;
+        private Task _timeTask;
+        private Task _updateTask;
 
         //TODO: Customizable colors through style classes, rewrite animations, show images when calling from config
 
@@ -59,54 +64,65 @@ namespace InfoDisplay.Player
                         }
                     };
                 }
-                CancellationToken cancellationToken = new CancellationToken();
-
-                SlideThread(cancellationToken);
-                TimeThread(cancellationToken);
-                CheckRestartTokenThread(cancellationToken);
 
                 brd_ContentBox.Effect = brd_ImgBox1.Effect = brd_TitleBox.Effect = slideBoxesShadowEffect;
-            }
 
+                _cts = new CancellationTokenSource();
+                var ct = _cts.Token;
+
+                _slideTask = RunSlideLoopAsync(ct);
+                _timeTask = RunTimeLoopAsync(ct);
+                _updateTask = RunUpdateLoopAsync(ct);
+            }
         }
 
-        public async void CheckRestartTokenThread(CancellationToken cancellationToken)
+        private async Task RunUpdateLoopAsync(CancellationToken ct)
         {
-            while (true)
+            try
             {
-                if (File.Exists(AppPaths.UpdateToken))
+                while (!ct.IsCancellationRequested)
                 {
-                    try
+                    if (File.Exists(AppPaths.UpdateToken))
                     {
-                        File.Delete(AppPaths.UpdateToken);
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show("Errore durante la cancellazione del file UpdateToken. Verificare che l'app abbia i permessi di scrittura nella directory in cui viene eseguita, altrimenti si verificherà quest'errore ad ogni tentativo di aggiornamento dei contenuti.\r\n\r\nException dump:\r\n" + e.Message, "Errore", MessageBoxButton.OK, MessageBoxImage.Error);
-                        Environment.Exit(1);
-                    }                    
-                    slides = new Slide().ReadSlides();
-
-
-                    if (slides == null || slides.Count == 0)
-                    {
-                        slides = new List<Slide>
+                        try
                         {
-                            new Slide
-                            {
-                                Title = "Nessuna slide configurata",
-                                Content = "Apri InfoDisplayConfig e aggiungi almeno una slide.",
-                                Layout = 1,
-                                Duration = 15000
-                            }
-                        };
+                            File.Delete(AppPaths.UpdateToken);
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show(
+                                "Errore durante la cancellazione del file UpdateToken. " +
+                                "Verificare che l'app abbia i permessi di scrittura nella directory in cui viene eseguita, " +
+                                "altrimenti si verificherà quest'errore ad ogni tentativo di aggiornamento dei contenuti.\r\n\r\n" +
+                                "Exception dump:\r\n" + e.Message,
+                                "Errore",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                            Environment.Exit(1);
+                        }
+
+                        slides = new Slide().ReadSlides();
+                        settings = GlobalSettings.Load();
+
+                        if (slides == null || slides.Count == 0)
+                        {
+                            slides = new List<Slide>
+                    {
+                        new Slide(
+                            "Nessuna slide configurata",
+                            "Apri InfoDisplay.Config e crea una nuova slide.",
+                            0)
+                    };
+                        }
                     }
 
-                    settings = GlobalSettings.Load();
+                    await Task.Delay(10000, ct);
                 }
-                await Task.Delay(10000);
             }
-
+            catch (TaskCanceledException)
+            {
+                // normale in chiusura
+            }
         }
         public async void PurgeExpired(CancellationToken cancellationToken)
         {
@@ -121,15 +137,75 @@ namespace InfoDisplay.Player
             }
         }
 
-        public async void TimeThread(CancellationToken cancellationToken)
+        private async Task RunTimeLoopAsync(CancellationToken ct)
         {
-            while (true)
+            try
             {
-                tb_liveTime.Text = DateTime.Now.ToString("t");
-                tb_liveDate.Text = DateTime.Now.ToString("ddd dd/MM/yyyy");
-                await Task.Delay(1000, cancellationToken);
-            }
+                var now = DateTime.Now;
 
+                // Inizializza subito la data e l'ora
+                tb_liveDate.Text = now.ToString("ddd dd/MM/yyyy");
+                tb_liveTime.Text = now.ToString("t");
+
+                var lastDate = now.Date;
+
+                while (!ct.IsCancellationRequested)
+                {
+                    now = DateTime.Now;
+
+                    tb_liveTime.Text = now.ToString("t");
+
+                    if (now.Date != lastDate)
+                    {
+                        tb_liveDate.Text = now.ToString("ddd dd/MM/yyyy");
+                        lastDate = now.Date;
+                    }
+
+                    await Task.Delay(1000, ct);
+                }
+            }
+            catch (TaskCanceledException){}
+        }
+
+
+        private async Task RunSlideLoopAsync(CancellationToken ct)
+        {
+            // Protezione ulteriore: se per qualche motivo slides è vuota
+            if (slides == null || slides.Count == 0)
+                return;
+
+            int index = -1;
+            int previousLayout = slides.Last().Layout;
+            ChangeLayout(slides.First().Layout);
+
+            try
+            {
+                while (!ct.IsCancellationRequested)
+                {
+                    index++;
+                    if (index >= slides.Count)
+                        index = 0;
+
+                    await FadeOutBoxes();
+
+                    if (previousLayout != slides[index].Layout)
+                        ChangeLayout(slides[index].Layout);
+
+                    tb_SlideTitle.Text = slides[index].Title;
+                    tb_SlideContent.Text = slides[index].Content;
+                    img_SlideImage.Source = slides[index].Image;
+
+                    await FadeInBoxes();
+
+                    await Task.Delay(slides[index].Duration, ct);
+
+                    previousLayout = slides[index].Layout;
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // interrotto alla chiusura
+            }
         }
 
         public void ChangeLayout(int layout)
@@ -244,6 +320,17 @@ namespace InfoDisplay.Player
                 return match;
 
             return new FontFamily(fallback);
+        }
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            if (_cts != null)
+            {
+                _cts.Cancel();
+                _cts.Dispose();
+                _cts = null;
+            }
         }
     }
 }
